@@ -16,6 +16,9 @@ dist/
 # Log files
 *.log
 
+# CQL files
+*.cql
+
 # Package files
 *.jar
 
