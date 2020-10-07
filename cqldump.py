@@ -4,8 +4,9 @@ from argparse import ArgumentParser
 from cassandra.cluster import Cluster
 from cassandra.query import dict_factory
 from cassandra.metadata import KeyspaceMetadata, TableMetadata
-from datetime import datetime
 from cassandra.query import SimpleStatement
+from cassandra.auth import PlainTextAuthProvider
+from datetime import datetime
 
 class CQLDUMP():
 
@@ -17,12 +18,14 @@ class CQLDUMP():
 
         parser = ArgumentParser()
         parser.add_argument('--h',type=str) #HOST
+        parser.add_argument('--u',type=str) #USER
+        parser.add_argument('--p',type=str) #PASS
         parser.add_argument('--w',type=str) #WHERE
         parser.add_argument('--k',type=str) #KEYSPACE
         parser.add_argument('--t',type=str) #TABLE  
 
         args = parser.parse_args() # GET PARAMS
-        self.connect(args.h, args.k) # CONNECT WITH CASSANDRA
+        self.connect(args.h, args.u, args.p, args.k) # CONNECT WITH CASSANDRA
         query = self.read(args.t, args.w) # BUILD QUERY
         self.write(query, args.k, args.t) # WRITE IN .CQL FILE
 
@@ -32,10 +35,17 @@ class CQLDUMP():
         print(f'Tempo total: {fim - inicio}')
         print("Dump successfully exported!")
 
-    def connect(self, host, keyspace):
+    def connect(self, host, user, password, keyspace):
         global cluster 
         global session
-        cluster = Cluster([host])
+        
+        auth_provider = ''
+        if user != '' and password != '':
+            auth_provider = PlainTextAuthProvider(username=user, password=password)
+            cluster = Cluster([host],auth_provider=auth_provider)
+        else:
+            cluster = Cluster([host])
+
         session = cluster.connect(keyspace)
         session.row_factory = dict_factory
 
@@ -43,7 +53,7 @@ class CQLDUMP():
     def read(self,table, where):
         query = f"SELECT * FROM {table}"
         if where:
-            query += f" WHERE {where} ALLOW FILTERING"
+            query += f" WHERE {where} limit 10 ALLOW FILTERING"
         return query
 
     def write(self, query, keyspace, table):
