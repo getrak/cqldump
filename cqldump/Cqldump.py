@@ -8,12 +8,15 @@ from cassandra.query import SimpleStatement
 from cassandra.auth import PlainTextAuthProvider
 from datetime import datetime
 
-class CQLDUMP():
+class Cqldump():
 
     cluster = ''
     session = ''
 
     def __init__(self):
+        print('iniciou')
+
+    def main(self):
         inicio = datetime.now()
 
         parser = ArgumentParser()
@@ -30,6 +33,8 @@ class CQLDUMP():
         self.write(query, args.k, args.t) # WRITE IN .CQL FILE
 
         fim = datetime.now()
+
+        # LOGS
         print(f'Início: {inicio}')
         print(f'Fim: {fim}')
         print(f'Tempo total: {fim - inicio}')
@@ -89,5 +94,3 @@ class CQLDUMP():
                 f.write(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
 
         f.close
-
-cqldump = CQLDUMP()

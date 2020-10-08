@@ -19,6 +19,10 @@ dist/
 # CQL files
 *.cql
 
+# Build do Python install
+build/
+cqldump.egg-info/
+
 # Package files
 *.jar
 
