@@ -13,22 +13,20 @@ class Cqldump():
     cluster = ''
     session = ''
 
-    def __init__(self):
-        print('iniciou')
-
     def main(self):
         inicio = datetime.now()
 
-        parser = ArgumentParser()
-        parser.add_argument('--h',type=str) #HOST
-        parser.add_argument('--u',type=str) #USER
-        parser.add_argument('--p',type=str) #PASS
-        parser.add_argument('--w',type=str) #WHERE
-        parser.add_argument('--k',type=str) #KEYSPACE
-        parser.add_argument('--t',type=str) #TABLE  
+        parser = ArgumentParser(description='Extract dump for Cassandra DB')
+        parser.add_argument('host', metavar='HOST', help='Hosting connection with Cassandra',type=str) #HOST
+        parser.add_argument('--u','--user',help='User',type=str) #USER
+        parser.add_argument('--p','--pass',help='Password',type=str) #PASS
+        parser.add_argument('--w','--where',help='Where Clause',type=str) #WHERE
+        parser.add_argument('--k','--keyspace',help='Keyspace',type=str) #KEYSPACE
+        parser.add_argument('--t','--table',help='Table',type=str) #TABLE  
 
         args = parser.parse_args() # GET PARAMS
-        self.connect(args.h, args.u, args.p, args.k) # CONNECT WITH CASSANDRA
+        
+        self.connect(args.host, args.u, args.p, args.k) # CONNECT WITH CASSANDRA
         query = self.read(args.t, args.w) # BUILD QUERY
         self.write(query, args.k, args.t) # WRITE IN .CQL FILE
 
@@ -82,7 +80,7 @@ class Cqldump():
             f.write(f"; \n\nUSE {keyspace};\n\n")
             f.write(create_table_sql)
 
-            statement = SimpleStatement(query, fetch_size=100000)
+            statement = SimpleStatement(query, fetch_size=80000)
             for row in session.execute(statement):
 
                 values = ""
