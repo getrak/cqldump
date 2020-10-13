@@ -7,6 +7,7 @@ from cassandra.metadata import KeyspaceMetadata, TableMetadata
 from cassandra.query import SimpleStatement
 from cassandra.auth import PlainTextAuthProvider
 from datetime import datetime
+from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 
 class Cqldump():
 
@@ -23,10 +24,11 @@ class Cqldump():
         parser.add_argument('--w','--where',help='Where Clause',type=str) #WHERE
         parser.add_argument('--k','--keyspace',help='Keyspace',type=str) #KEYSPACE
         parser.add_argument('--t','--table',help='Table',type=str) #TABLE  
+        parser.add_argument('--ssl', help='Path to SSL key')
 
         args = parser.parse_args() # GET PARAMS
         
-        self.connect(args.host, args.u, args.p, args.k) # CONNECT WITH CASSANDRA
+        self.connect(args.host, args.u, args.p, args.ssl, args.k) # CONNECT WITH CASSANDRA
         query = self.read(args.t, args.w) # BUILD QUERY
         self.stdout(query, args.k, args.t) # WRITE IN .CQL FILE
 
@@ -38,7 +40,7 @@ class Cqldump():
         print(f'# mpo total: {fim - inicio}')
         print("# Dump successfully exported!")
 
-    def connect(self, host, user, password, keyspace):
+    def connect(self, host, user, password, ssl, keyspace):
         global cluster 
         global session
         
@@ -46,6 +48,13 @@ class Cqldump():
         if user != '' and password != '':
             auth_provider = PlainTextAuthProvider(username=user, password=password)
             cluster = Cluster([host],auth_provider=auth_provider)
+        elif ssl != '':
+            ssl_opts = {
+                'ca_certs': ssl,
+                'ssl_version': PROTOCOL_TLSv1,
+                'cert_reqs': CERT_REQUIRED  # Certificates are required and validated
+            }
+            cluster = Cluster([host], ssl_context=ssl_opts)
         else:
             cluster = Cluster([host])
 
