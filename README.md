@@ -1,29 +1,52 @@
-# README #
+# CQLDUMP #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+CQLDUMP surgiu da necessidade de extração de dump do Apache Cassandra DB sem a obrigação de extrair todo o seu conteúdo que em geral pode ser muito grande.
 
-### What is this repository for? ###
+Ele permite o uso da cláusula where para filtrar e limitar a quantidade de registros que serão exportados para o dump.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+O dump está pronto para ser importado através do source do Cassandra, já incluindo os comandos de criação do Keyspace e da Table exportada.
 
-### How do I get set up? ###
+### Detalhes ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Desenvolvido em Python
+* Versão: 0.0.1
 
-### Contribution guidelines ###
+### Instalação ###
 
-* Writing tests
-* Code review
-* Other guidelines
+* Faça o clone deste repositório
+```bash
 
-### Who do I talk to? ###
+    $ git clone git@bitbucket.org:getrak/cqldump.git
 
-* Repo owner or admin
-* Other community or team contact
+```
+* Entre no diretório clonado
+```bash
+
+    $ cd cqldump
+
+```
+* Instale o Utilitário
+```bash
+
+    $ sudo python3 setup.py install
+
+```
+Obs: É necessário possuir o Python instalado, para mais informações sobre como fazer a instalação acesse o link: https://www.python.org/downloads/
+
+### Como usar ###
+
+```bash
+
+    Usage: cqldump [host] [options ...]  > [nome_do_arquivo.cql]
+
+    Options:
+
+		--u, --user		Username
+		--p, --password	Password
+		--ssl			Path do arquivo chave para conexão SSL
+		--k, --keyspace nome do Keyspace
+		--t, --table	nome da Table
+		--w, --where	Cláusula Where
+		-h, --help     output usage information
+        
+```
