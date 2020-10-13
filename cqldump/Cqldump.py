@@ -28,15 +28,15 @@ class Cqldump():
         
         self.connect(args.host, args.u, args.p, args.k) # CONNECT WITH CASSANDRA
         query = self.read(args.t, args.w) # BUILD QUERY
-        self.write(query, args.k, args.t) # WRITE IN .CQL FILE
+        self.stdout(query, args.k, args.t) # WRITE IN .CQL FILE
 
         fim = datetime.now()
 
         # LOGS
-        print(f'Início: {inicio}')
-        print(f'Fim: {fim}')
-        print(f'Tempo total: {fim - inicio}')
-        print("Dump successfully exported!")
+        print(f'# Início: {inicio}')
+        print(f'# Fim: {fim}')
+        print(f'# mpo total: {fim - inicio}')
+        print("# Dump successfully exported!")
 
     def connect(self, host, user, password, keyspace):
         global cluster 
@@ -92,3 +92,32 @@ class Cqldump():
                 f.write(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
 
         f.close
+    
+    def stdout(self, query, keyspace, table):
+        global cluster
+        global session
+        keyspace_metadata = cluster.metadata.keyspaces[keyspace]
+
+        columns =  keyspace_metadata.tables[table].columns
+        str_columns = ""
+        for col in columns:
+            str_columns += col+", "
+        str_columns = str_columns[:(len(str_columns) - 2)]
+            
+        create_keyspace_sql = keyspace_metadata.as_cql_query().replace("CREATE KEYSPACE","CREATE KEYSPACE IF NOT EXISTS")
+        create_table_sql = keyspace_metadata.tables[table].export_as_string().replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS").replace("}'","}").replace("caching = '{","caching = {").replace('"',"'")
+
+        print(create_keyspace_sql)
+        print(f"; \n\nUSE {keyspace};\n\n")
+        print(create_table_sql)
+
+        statement = SimpleStatement(query, fetch_size=80000)
+        for row in session.execute(statement):
+
+            values = ""
+            for col in columns:
+                values += (f"{row[col]}, ") if isinstance(row[col], int) else (f"'{row[col]}', ")
+            values = values[:(len(values) - 2)]
+            
+
+            print(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
