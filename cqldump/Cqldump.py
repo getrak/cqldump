@@ -15,6 +15,9 @@ class Cqldump():
     session = ''
 
     def main(self):
+        """
+            Método Main responsável por receber os parâmetros e invocar os outros métodos
+        """
         inicio = datetime.now()
 
         parser = ArgumentParser(description='Extract dump for Cassandra DB')
@@ -41,6 +44,9 @@ class Cqldump():
         print("# Dump successfully exported!")
 
     def connect(self, host, user, password, ssl, keyspace):
+        """
+            Função que faz a conexão via DataStax Driver ao Apache Cassandra
+        """
         global cluster 
         global session
         
@@ -63,12 +69,18 @@ class Cqldump():
 
     
     def read(self,table, where):
+        """
+            Função que constrói a query responsável por extrair os dados do Apacha Cassandra
+        """
         query = f"SELECT * FROM {table}"
         if where:
             query += f" WHERE {where} limit 10 ALLOW FILTERING"
         return query
 
     def write(self, query, keyspace, table):
+        """
+            Função que escreve o resultado do Dump em arquivo .cql
+        """
         global cluster
         global session
         keyspace_metadata = cluster.metadata.keyspaces[keyspace]
@@ -103,6 +115,9 @@ class Cqldump():
         f.close
     
     def stdout(self, query, keyspace, table):
+        """
+            Função que imprimi o resultado do Dump para a saída padrão (stdout)
+        """
         global cluster
         global session
         keyspace_metadata = cluster.metadata.keyspaces[keyspace]
