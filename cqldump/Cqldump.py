@@ -1,5 +1,4 @@
 # cqldump.py
-#! /usr/bin/env python
 from argparse import ArgumentParser
 from cassandra.cluster import Cluster
 from cassandra.query import dict_factory
@@ -9,6 +8,7 @@ from cassandra.auth import PlainTextAuthProvider
 from datetime import datetime
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 
+
 class Cqldump():
 
     cluster = ''
@@ -16,17 +16,18 @@ class Cqldump():
 
     def main(self):
         """
-            Método Main responsável por receber os parâmetros e invocar os outros métodos
+            Método Main responsável por receber os 
+            parâmetros e invocar os outros métodos
         """
         inicio = datetime.now()
 
         parser = ArgumentParser(description='Extract dump for Cassandra DB')
         parser.add_argument('host', metavar='HOST', help='Hosting connection with Cassandra',type=str) #HOST
-        parser.add_argument('--u','--user',help='User',type=str) #USER
-        parser.add_argument('--p','--pass',help='Password',type=str) #PASS
-        parser.add_argument('--w','--where',help='Where Clause',type=str) #WHERE
-        parser.add_argument('--k','--keyspace',help='Keyspace',type=str) #KEYSPACE
-        parser.add_argument('--t','--table',help='Table',type=str) #TABLE  
+        parser.add_argument('k', metavar='KEYSPACE',help='Keyspace name',type=str) #KEYSPACE
+        parser.add_argument('t', metavar='TABLE', help='Table name',type=str) #TABLE  
+        parser.add_argument('--u','--user', metavar='User', type=str) #USER
+        parser.add_argument('--p','--pass', metavar='Password', type=str) #PASS
+        parser.add_argument('--w','--where', metavar='Where', type=str) #WHERE
         parser.add_argument('--ssl', help='Path to SSL key')
 
         args = parser.parse_args() # GET PARAMS
