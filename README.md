@@ -37,15 +37,13 @@ Obs: É necessário possuir o Python instalado, para mais informações sobre co
 
 ```bash
 
-    Usage: cqldump [host] [options ...]  > [nome_do_arquivo.cql]
+    Usage: cqldump [host] [keyspace] [table] [options ...]  > [nome_do_arquivo.cql]
 
     Options:
 
 		--u, --user		Username
 		--p, --password	Password
 		--ssl			Path do arquivo chave para conexão SSL
-		--k, --keyspace nome do Keyspace
-		--t, --table	nome da Table
 		--w, --where	Cláusula Where
 		-h, --help     output usage information
         
