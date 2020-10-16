@@ -80,6 +80,13 @@ class Cqldump():
                 'cert_reqs': CERT_REQUIRED
             }
             self.cluster = Cluster([host], ssl_context=ssl_opts)
+        elif user != '' and password != '' and ssl != '':
+            ssl_opts = {
+                'ca_certs': ssl,
+                'ssl_version': PROTOCOL_TLSv1,
+                'cert_reqs': CERT_REQUIRED
+            }
+            self.cluster = Cluster([host], auth_provider=auth, ssl_context=ssl_opts)
         else:
             self.cluster = Cluster([host])
 
