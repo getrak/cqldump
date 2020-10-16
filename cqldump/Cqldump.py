@@ -56,10 +56,10 @@ class Cqldump():
         fim = datetime.now()
 
         # LOGS
-        print(f'\n# Início: {inicio}')
-        print(f'# Fim: {fim}')
-        print(f'# mpo total: {fim - inicio}')
-        print("# Dump successfully exported!")
+        print(f'\n/** Início: {inicio} **/')
+        print(f'/** Fim: {fim} **/')
+        print(f'/** mpo total: {fim - inicio} **/')
+        print("/** Dump successfully exported! **/")
 
     def connect(self, host, user, password, ssl, keyspace):
         """
