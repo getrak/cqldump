@@ -16,8 +16,8 @@ class Cqldump():
 
     def main(self):
         """
-            Método Main responsável por receber os
-            parâmetros e invocar os outros métodos
+            Main method responsible for receiving the
+            parameters and invoke the other methods
         """
         inicio = datetime.now()
 
@@ -39,7 +39,7 @@ class Cqldump():
         parser.add_argument('--p', '--pass', metavar='Password',
                             type=str)
         # WHERE
-        parser.add_argument('--w', '--where', metavar='Where',
+        parser.add_argument('--w', '--where', metavar='Where Clause',
                             type=str)
         # SSL
         parser.add_argument('--ssl', help='Path to SSL key')
@@ -56,14 +56,15 @@ class Cqldump():
         fim = datetime.now()
 
         # LOGS
-        print(f'\n/** Início: {inicio} **/')
-        print(f'/** Fim: {fim} **/')
-        print(f'/** mpo total: {fim - inicio} **/')
+        print(f'\n/** Start: {inicio} **/')
+        print(f'/** End: {fim} **/')
+        print(f'/** Duration: {fim - inicio} **/')
         print("/** Dump successfully exported! **/")
 
     def connect(self, host, user, password, ssl, keyspace):
         """
-            Função que faz a conexão via DataStax Driver ao Apache Cassandra
+            Function that makes the connection to
+            Apache Cassandra by DataStax Driver
         """
         global cluster
         global session
@@ -87,17 +88,17 @@ class Cqldump():
 
     def read(self, table, where):
         """
-            Função que constrói a query responsável por
-            extrair os dados do Apacha Cassandra
+            Function that builds the query responsible for
+            extract data from Apacha Cassandra
         """
         query = f"SELECT * FROM {table}"
         if where:
-            query += f" WHERE {where} limit 10 ALLOW FILTERING"
+            query += f" WHERE {where} ALLOW FILTERING"
         return query
 
     def stdout(self, query, keyspace, table):
         """
-            Função que imprimi o resultado do Dump para a saída padrão (stdout)
+            Function that prints the Dump result to standard output (stdout)
         """
         global cluster
         global session
