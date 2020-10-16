@@ -66,7 +66,7 @@ class Cqldump():
             Function that makes the connection to
             Apache Cassandra by DataStax Driver
         """
-        
+
         self.session
 
         auth = ''
@@ -86,7 +86,8 @@ class Cqldump():
                 'ssl_version': PROTOCOL_TLSv1,
                 'cert_reqs': CERT_REQUIRED
             }
-            self.cluster = Cluster([host], auth_provider=auth, ssl_context=ssl_opts)
+            self.cluster = Cluster([host], auth_provider=auth,
+                                   ssl_context=ssl_opts)
         else:
             self.cluster = Cluster([host])
 
@@ -110,10 +111,14 @@ class Cqldump():
 
         keyspace_metadata = self.cluster.metadata.keyspaces[keyspace]
 
-        columns = keyspace_metadata.tables[table].columns
+        query_columns = (f"select column_name, type from system_schema.columns \
+                         where keyspace_name = '{keyspace}'")
+        columns = self.session.execute(query_columns)
+        array_col = []
         str_columns = ""
         for col in columns:
-            str_columns += col+", "
+            array_col.append(col)
+            str_columns += col['column_name']+", "
         str_columns = str_columns[:(len(str_columns) - 2)]
 
         create_keyspace_sql = keyspace_metadata.as_cql_query(). \
@@ -129,13 +134,12 @@ class Cqldump():
 
         statement = SimpleStatement(query, fetch_size=80000)
         for row in self.session.execute(statement):
-
             values = ""
-            for col in columns:
-                if (isinstance(row[col], int)):
-                    values += (f"{row[col]}, ")
+            for col in array_col:
+                if(col['type'] != 'int'):
+                    values += (f"'{row[col['column_name']]}', ")
                 else:
-                    values += (f"'{row[col]}', ")
-            values = values[:(len(values) - 2)]
+                    values += (f"{row[col['column_name']]}, ")
 
+            values = values[:(len(values) - 2)]
             print(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
