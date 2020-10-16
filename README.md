@@ -1,50 +1,50 @@
 # CQLDUMP #
 
-CQLDUMP surgiu da necessidade de extração de dump do Apache Cassandra DB sem a obrigação de extrair todo o seu conteúdo que em geral pode ser muito grande.
+CQLDUMP arose from the need to extract dump from Apache Cassandra DB without the obligation to extract all its content, which in general can be very large.
 
-Ele permite o uso da cláusula where para filtrar e limitar a quantidade de registros que serão exportados para o dump.
+It allows the use of the where clause to filter and limit the number of records that will be exported to the dump.
 
-O dump está pronto para ser importado através do source do Cassandra, já incluindo os comandos de criação do Keyspace e da Table exportada.
+The dump is ready to be imported using Cassandra's source command, including the creation commands for Keyspace and the exported Table.
 
-### Detalhes ###
+### Details ###
 
-* Desenvolvido em Python
-* Versão: 0.0.1
+* Developed in Python
+* Version: 0.0.1
 
-### Instalação ###
+### Installation ###
 
-* Faça o clone deste repositório
+* Clone this repository
 ```bash
 
     $ git clone git@bitbucket.org:getrak/cqldump.git
 
 ```
-* Entre no diretório clonado
+* Enter the cloned directory
 ```bash
 
     $ cd cqldump
 
 ```
-* Instale o Utilitário
+* Install the tool
 ```bash
 
     $ sudo python3 setup.py install
 
 ```
-Obs: É necessário possuir o Python instalado, para mais informações sobre como fazer a instalação acesse o link: https://www.python.org/downloads/
+Note: It is necessary to have Python installed, for more information on how to do the installation visit the link: https://www.python.org/downloads/
 
-### Como usar ###
+### Usage ###
 
 ```bash
 
-    Usage: cqldump [host] [keyspace] [table] [options ...]  > [nome_do_arquivo.cql]
+    Usage: cqldump [host] [keyspace] [table] [options ...]  > [file_name.cql]
 
     Options:
 
 		--u, --user		Username
 		--p, --password	Password
-		--ssl			Path do arquivo chave para conexão SSL
-		--w, --where	Cláusula Where
-		-h, --help     output usage information
+		--ssl			Key file path for SSL connection
+		--w, --where	Where Clause
+		-h, --help      output usage information
         
 ```
