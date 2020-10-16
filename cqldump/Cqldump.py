@@ -66,25 +66,25 @@ class Cqldump():
             Function that makes the connection to
             Apache Cassandra by DataStax Driver
         """
-        global cluster
-        global session
+        
+        self.session
 
         auth = ''
         if user != '' and password != '':
             auth = PlainTextAuthProvider(username=user, password=password)
-            cluster = Cluster([host], auth_provider=auth)
+            self.cluster = Cluster([host], auth_provider=auth)
         elif ssl != '':
             ssl_opts = {
                 'ca_certs': ssl,
                 'ssl_version': PROTOCOL_TLSv1,
                 'cert_reqs': CERT_REQUIRED
             }
-            cluster = Cluster([host], ssl_context=ssl_opts)
+            self.cluster = Cluster([host], ssl_context=ssl_opts)
         else:
-            cluster = Cluster([host])
+            self.cluster = Cluster([host])
 
-        session = cluster.connect(keyspace)
-        session.row_factory = dict_factory
+        self.session = self.cluster.connect(keyspace)
+        self.session.row_factory = dict_factory
 
     def read(self, table, where):
         """
@@ -100,9 +100,8 @@ class Cqldump():
         """
             Function that prints the Dump result to standard output (stdout)
         """
-        global cluster
-        global session
-        keyspace_metadata = cluster.metadata.keyspaces[keyspace]
+
+        keyspace_metadata = self.cluster.metadata.keyspaces[keyspace]
 
         columns = keyspace_metadata.tables[table].columns
         str_columns = ""
@@ -122,7 +121,7 @@ class Cqldump():
         print(create_table_sql)
 
         statement = SimpleStatement(query, fetch_size=80000)
-        for row in session.execute(statement):
+        for row in self.session.execute(statement):
 
             values = ""
             for col in columns:
