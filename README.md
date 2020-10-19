@@ -1,29 +1,50 @@
-# README #
+# CQLDUMP #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+CQLDUMP arose from the need to extract dump from Apache Cassandra DB without the obligation to extract all its content, which in general can be very large.
 
-### What is this repository for? ###
+It allows the use of the where clause to filter and limit the number of records that will be exported to the dump.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+The dump is ready to be imported using Cassandra's source command, including the creation commands for Keyspace and the exported Table.
 
-### How do I get set up? ###
+### Details ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Developed in Python
+* Version: 0.0.1
 
-### Contribution guidelines ###
+### Installation ###
 
-* Writing tests
-* Code review
-* Other guidelines
+* Clone this repository
+```bash
 
-### Who do I talk to? ###
+    $ git clone git@bitbucket.org:getrak/cqldump.git
 
-* Repo owner or admin
-* Other community or team contact
+```
+* Enter the cloned directory
+```bash
+
+    $ cd cqldump
+
+```
+* Install the tool
+```bash
+
+    $ sudo python3 setup.py install
+
+```
+Note: It is necessary to have Python installed, for more information on how to do the installation visit the link: https://www.python.org/downloads/
+
+### Usage ###
+
+```bash
+
+    Usage: cqldump [host] [keyspace] [table] [options ...]  > [file_name.cql]
+
+    Options:
+
+		--u, --user		Username
+		--p, --password	Password
+		--ssl			Key file path for SSL connection
+		--w, --where	Where Clause
+		-h, --help      output usage information
+        
+```
