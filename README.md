@@ -11,6 +11,13 @@ The dump is ready to be imported using Cassandra's source command, including the
 * Developed in Python
 * Version: 0.0.1
 
+### Requirements ###
+
+* Python 3.7 or higher
+* Pip 3
+
+For more info visit the link: https://www.python.org/
+
 ### Installation ###
 
 * Clone this repository
@@ -31,7 +38,6 @@ The dump is ready to be imported using Cassandra's source command, including the
     $ sudo python3 setup.py install
 
 ```
-Note: It is necessary to have Python installed, for more information on how to do the installation visit the link: https://www.python.org/downloads/
 
 ### Usage ###
 

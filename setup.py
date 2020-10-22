@@ -27,7 +27,7 @@ setup(
     keywords='cqldump',
     # download_url='https://github.com/drgarcia1986/cli/archive/master.zip',
     packages=find_packages(exclude=['tests*']),
-    install_requires=[],
+    install_requires=['cassandra-driver'],
     entry_points={'console_scripts': ['cqldump = cqldump:main']},
     platforms='windows linux',
 )
