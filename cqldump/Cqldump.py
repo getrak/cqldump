@@ -7,6 +7,7 @@ from cassandra.query import SimpleStatement
 from cassandra.auth import PlainTextAuthProvider
 from datetime import datetime
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
+import sys
 
 
 class Cqldump():
@@ -47,11 +48,18 @@ class Cqldump():
         args = parser.parse_args()  # GET PARAMS
 
         # CONNECT WITH CASSANDRA
-        self.connect(args.host, args.u, args.p, args.ssl, args.k)
+        try:
+            self.connect(args.host, args.u, args.p, args.ssl, args.k)
+        except Exception as e:
+            sys.exit(e)
+
         # BUILD QUERY
         query = self.read(args.t, args.w)
         # WRITE IN .CQL FILE
-        self.stdout(query, args.k, args.t)
+        try:
+            self.stdout(query, args.k, args.t)
+        except Exception as e:
+            sys.exit(f'Table {e} not found')
 
         fim = datetime.now()
 
@@ -128,18 +136,24 @@ class Cqldump():
             .replace("}'", "}").replace("caching = '{", "caching = {") \
             .replace('"', "'")
 
-        print(create_keyspace_sql)
-        print(f"; \n\nUSE {keyspace};\n\n")
-        print(create_table_sql)
+        try:
+            cql_exit = ''
+            statement = SimpleStatement(query, fetch_size=80000)
+            for row in self.session.execute(statement):
+                values = ""
+                for col in array_col:
+                    if(col['type'] != 'int'):
+                        values += (f"'{row[col['column_name']]}', ")
+                    else:
+                        values += (f"{row[col['column_name']]}, ")
 
-        statement = SimpleStatement(query, fetch_size=80000)
-        for row in self.session.execute(statement):
-            values = ""
-            for col in array_col:
-                if(col['type'] != 'int'):
-                    values += (f"'{row[col['column_name']]}', ")
-                else:
-                    values += (f"{row[col['column_name']]}, ")
+                values = values[:(len(values) - 2)]
+                cql_exit += (f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
 
-            values = values[:(len(values) - 2)]
-            print(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
+            print(create_keyspace_sql)
+            print(f"; \n\nUSE {keyspace};\n\n")
+            print(create_table_sql)
+            print(cql_exit)
+
+        except Exception as e:
+            sys.exit(e)
