@@ -7,6 +7,7 @@ from cassandra.query import SimpleStatement
 from cassandra.auth import PlainTextAuthProvider
 from datetime import datetime
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
+import sys
 
 
 class Cqldump():
@@ -47,11 +48,18 @@ class Cqldump():
         args = parser.parse_args()  # GET PARAMS
 
         # CONNECT WITH CASSANDRA
-        self.connect(args.host, args.u, args.p, args.ssl, args.k)
+        try:
+            self.connect(args.host, args.u, args.p, args.ssl, args.k)
+        except Exception as e:
+            sys.exit(e)
+
         # BUILD QUERY
         query = self.read(args.t, args.w)
         # WRITE IN .CQL FILE
-        self.stdout(query, args.k, args.t)
+        try:
+            self.stdout(query, args.k, args.t)
+        except Exception as e:
+            sys.exit(f'Table {e} not found')
 
         fim = datetime.now()
 
@@ -95,6 +103,7 @@ class Cqldump():
         self.session.row_factory = dict_factory
 
     def read(self, table, where):
+        
         """
             Function that builds the query responsible for
             extract data from Apacha Cassandra
@@ -112,8 +121,10 @@ class Cqldump():
         keyspace_metadata = self.cluster.metadata.keyspaces[keyspace]
 
         query_columns = (f"select column_name, type from system_schema.columns \
-                         where keyspace_name = '{keyspace}'")
+                         where keyspace_name = '{keyspace}' \
+                         and table_name = '{table}'")
         columns = self.session.execute(query_columns)
+
         array_col = []
         str_columns = ""
         for col in columns:
@@ -127,19 +138,27 @@ class Cqldump():
             .replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS") \
             .replace("}'", "}").replace("caching = '{", "caching = {") \
             .replace('"', "'")
+        
+        try:
+            cql_output = []
+            statement = SimpleStatement(query, fetch_size=80000)
+            for row in self.session.execute(statement):
+                values = ""
+                for col in array_col:
+                    if(col['type'] != 'int'):
+                        values += (f"'{row[col['column_name']]}', ")
+                    else:
+                        values += (f"{row[col['column_name']]}, ")
 
-        print(create_keyspace_sql)
-        print(f"; \n\nUSE {keyspace};\n\n")
-        print(create_table_sql)
+                values = values[:(len(values) - 2)]
+                cql_output.append(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
+                
+            cql_output = ''.join(cql_output)
+            
+            print(create_keyspace_sql)
+            print(f"; \n\nUSE {keyspace};\n\n")
+            print(create_table_sql)
+            print(cql_output)
 
-        statement = SimpleStatement(query, fetch_size=80000)
-        for row in self.session.execute(statement):
-            values = ""
-            for col in array_col:
-                if(col['type'] != 'int'):
-                    values += (f"'{row[col['column_name']]}', ")
-                else:
-                    values += (f"{row[col['column_name']]}, ")
-
-            values = values[:(len(values) - 2)]
-            print(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
+        except Exception as e:
+            sys.exit(e)
