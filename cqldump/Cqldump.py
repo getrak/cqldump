@@ -103,7 +103,7 @@ class Cqldump():
         self.session.row_factory = dict_factory
 
     def read(self, table, where):
-        
+
         """
             Function that builds the query responsible for
             extract data from Apacha Cassandra
@@ -120,9 +120,9 @@ class Cqldump():
 
         keyspace_metadata = self.cluster.metadata.keyspaces[keyspace]
 
-        query_columns = (f"select column_name, type from system_schema.columns \
+        query_columns = (f"select column_name, validator from system.schema_columns \
                          where keyspace_name = '{keyspace}' \
-                         and table_name = '{table}'")
+                         and columnfamily_name = '{table}'")
         columns = self.session.execute(query_columns)
 
         array_col = []
@@ -138,27 +138,23 @@ class Cqldump():
             .replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS") \
             .replace("}'", "}").replace("caching = '{", "caching = {") \
             .replace('"', "'")
-        
+
         try:
-            cql_output = []
+            print(create_keyspace_sql)
+            print(f"; \n\nUSE {keyspace};\n\n")
+            print(create_table_sql)
+
             statement = SimpleStatement(query, fetch_size=80000)
             for row in self.session.execute(statement):
                 values = ""
                 for col in array_col:
-                    if(col['type'] != 'int'):
+                    if(col['validator'] != 'org.apache.cassandra.db.marshal.Int32Type'):
                         values += (f"'{row[col['column_name']]}', ")
                     else:
                         values += (f"{row[col['column_name']]}, ")
 
                 values = values[:(len(values) - 2)]
-                cql_output.append(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
-                
-            cql_output = ''.join(cql_output)
-            
-            print(create_keyspace_sql)
-            print(f"; \n\nUSE {keyspace};\n\n")
-            print(create_table_sql)
-            print(cql_output)
+                print(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
 
         except Exception as e:
             sys.exit(e)
