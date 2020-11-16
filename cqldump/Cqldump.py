@@ -103,7 +103,7 @@ class Cqldump():
         self.session.row_factory = dict_factory
 
     def read(self, table, where):
-        
+
         """
             Function that builds the query responsible for
             extract data from Apacha Cassandra
@@ -138,12 +138,12 @@ class Cqldump():
             .replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS") \
             .replace("}'", "}").replace("caching = '{", "caching = {") \
             .replace('"', "'")
-        
+
         try:
             print(create_keyspace_sql)
             print(f"; \n\nUSE {keyspace};\n\n")
             print(create_table_sql)
-            # cql_output = []
+
             statement = SimpleStatement(query, fetch_size=80000)
             for row in self.session.execute(statement):
                 values = ""
@@ -155,7 +155,6 @@ class Cqldump():
 
                 values = values[:(len(values) - 2)]
                 print(f"\nINSERT INTO {table} ({str_columns}) VALUES ({values});")
-                
-            
+
         except Exception as e:
             sys.exit(e)
