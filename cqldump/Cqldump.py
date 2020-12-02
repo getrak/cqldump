@@ -57,7 +57,7 @@ class Cqldump():
             sys.exit(e)
 
         # BUILD QUERY
-        query = self.read(args.t, args.w, 'LIMIT ' + args.l)
+        query = self.read(args.t, args.w, args.l)
         # WRITE IN .CQL FILE
         try:
             self.stdout(query, args.k, args.t)
@@ -112,8 +112,12 @@ class Cqldump():
             extract data from Apacha Cassandra
         """
         query = f"SELECT * FROM {table}"
-        if where:
-            query += f" WHERE {where} {limit} ALLOW FILTERING"
+        if where and limit:
+            query += f" WHERE {where} LIMIT {limit} ALLOW FILTERING"
+        elif where:
+            query += f" WHERE {where}  ALLOW FILTERING"
+        elif limit:
+            query += f" LIMIT {limit}"
         return query
 
     def stdout(self, query, keyspace, table):
