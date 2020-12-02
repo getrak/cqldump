@@ -42,6 +42,9 @@ class Cqldump():
         # WHERE
         parser.add_argument('--w', '--where', metavar='Where Clause',
                             type=str)
+        # LIMIT
+        parser.add_argument('--l', '--limit', metavar='Limit Rows',
+                            type=str)
         # SSL
         parser.add_argument('--ssl', help='Path to SSL key')
 
@@ -54,7 +57,7 @@ class Cqldump():
             sys.exit(e)
 
         # BUILD QUERY
-        query = self.read(args.t, args.w)
+        query = self.read(args.t, args.w, 'LIMIT ' + args.l)
         # WRITE IN .CQL FILE
         try:
             self.stdout(query, args.k, args.t)
@@ -102,7 +105,7 @@ class Cqldump():
         self.session = self.cluster.connect(keyspace)
         self.session.row_factory = dict_factory
 
-    def read(self, table, where):
+    def read(self, table, where, limit):
 
         """
             Function that builds the query responsible for
@@ -110,7 +113,7 @@ class Cqldump():
         """
         query = f"SELECT * FROM {table}"
         if where:
-            query += f" WHERE {where} ALLOW FILTERING"
+            query += f" WHERE {where} {limit} ALLOW FILTERING"
         return query
 
     def stdout(self, query, keyspace, table):
