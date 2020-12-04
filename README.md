@@ -51,6 +51,7 @@ For more info visit the link: https://www.python.org/
 		--p, --password	Password
 		--ssl			Key file path for SSL connection
 		--w, --where	Where Clause
+		--l, --limit	Limit Rows
 		-h, --help      output usage information
         
 ```
